@@ -9,8 +9,9 @@ module Snap.Snaplet.Sedna where
 -------------------------------------------------------------------------------
 import           Control.Monad.IO.Control
 import           Control.Monad.State
-import           Database.SednaDB.SednaTypes
-import qualified Database.SednaDB.SednaBindings as Sedna 
+import           Database.SednaTypes
+import           Database.SednaBindings
+import           Database.Sedna as Sedna
 import           Snap.Snaplet
 import           Snap.Snaplet.Sedna.Types
 
@@ -52,29 +53,33 @@ withSedna' f = do
 
 -------------------------------------------------------------------------------
 query :: HasSedna m s => Query -> m QueryResult
-query xQuery = do  
-  withSedna (`Sedna.sednaExecute` xQuery)
-  withSedna Sedna.sednaGetResultString 
+query xQuery = do
+        withSedna $ (\conn -> withTransaction conn (\conn' -> do 
+                               sednaExecute conn' xQuery
+                               sednaGetResultString conn')) 
 
 
 -------------------------------------------------------------------------------
 disconnect :: HasSedna m s => m ()
-disconnect = withSedna Sedna.sednaCloseConnection                 
+disconnect = withSedna sednaCloseConnection                 
          
 
 ------------------------------------------------------------------------------- 
 commit :: HasSedna m s => m ()
-commit = withSedna Sedna.sednaCommit
+commit = withSedna sednaCommit
 
 
 ------------------------------------------------------------------------------- 
 rollback :: HasSedna m s => m ()
-rollback = withSedna Sedna.sednaRollBack
+rollback = withSedna sednaRollBack
 
 
 --------------------------------------------------------------------------------
---loadXMLFile :: HasSedna m s => Document -> Collection -> m ()
---loadXMLFile filepath doc coll = withSedna (`Sedna.sednaLoadFile` filepath doc coll)
+loadXMLFile :: HasSedna m s => FilePath -> Document -> Collection -> m ()
+loadXMLFile filepath doc coll = withSedna
+                                (\conn' -> Sedna.loadXMLFile conn' 
+                                                             filepath 
+                                                             doc 
+                                                             coll)
 
---------------------------------------------------------------------------------
 

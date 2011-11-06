@@ -1,5 +1,5 @@
 Name:                   snaplet-sedna
-Version:                0.0.1
+Version:                0.0.1.0
 License:                GPL-3
 Cabal-Version:          >= 1.10.0
 License-File:           LICENSE
@@ -7,12 +7,12 @@ Author:                 Eric C. Jones
 Build-Type:             Simple
 Maintainer:             Eric Jones (ericclaudejones at gmail.com)
 Stability:              alpha
-Synopsis:               Sedna C API XML Binding
+Synopsis:               Snaplet for Sedna Bindings. Essentailly a rip of snaplet-hdbc.
 
-Description:            Sedna native XML database bindings.
+Description:            Snaplet for Sedna native XML database bindings.
                         http://www.sedna.org/
 
-Category:               Database, FFI
+Category:               Database
 
 Library
   Hs-Source-Dirs:         src
@@ -22,8 +22,13 @@ Library
                           bytestring       >= 0.9.1   && < 0.10,
                           containers       >= 0.3     && < 0.5,
                           mtl              >  2.0     && < 2.1,
+                          monad-control,
+                          resource-pool,
+                          sednaDBXML      == 0.1.2.4,
+                          snap
 
-  Exposed-Modules:        
+  Exposed-Modules:        Snap.Snaplet.Sedna,
+                          Snap.Snaplet.Sedna.Types
                                                                          
   Ghc-Options:            -Wall
 

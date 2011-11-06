@@ -32,8 +32,8 @@ instance MonadControlIO (Handler b v) where
 
 
 -------------------------------------------------------------------------------
-sednaInit :: ConnSrc s => (s SednaConnection) -> SnapletInit b (SednaSnaplet s)
-sednaInit src = makeSnaplet "sedna" "Sedna Database Connectivity" Nothing $ do 
+sednaInit :: ConnSrc s => s SednaConnection -> SnapletInit b (SednaSnaplet s)
+sednaInit src = makeSnaplet "sedna" "Sedna Database Connectivity" Nothing $
                   return $ SednaSnaplet src
 
 
@@ -53,10 +53,11 @@ withSedna' f = do
 
 -------------------------------------------------------------------------------
 query :: HasSedna m s => Query -> m QueryResult
-query xQuery = do
-        withSedna $ (\conn -> withTransaction conn (\conn' -> do 
-                               sednaExecute conn' xQuery
-                               sednaGetResultString conn')) 
+query xQuery = 
+    withSedna (\conn -> withTransaction conn 
+                        (\conn' -> do
+                           sednaExecute conn' xQuery
+                           sednaGetResultString conn')) 
 
 
 -------------------------------------------------------------------------------
